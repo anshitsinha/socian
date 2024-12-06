@@ -1,0 +1,10 @@
+[
+    { "id": 1, "name": "Dr. Anupama Namburu", "email": "danceclub@example.com", "password": "secure123", "club": "Dance Club" },
+    { "id": 2, "name": "Dr. Umesh Kumar Khute", "email": "debateclub@example.com", "password": "secure123", "club": "Debating Club" },
+    { "id": 3, "name": "Dr. Vijender Singh", "email": "dramaclub@example.com", "password": "secure123", "club": "Drama Club" },
+    { "id": 4, "name": "Dr. Vinay Kumar Gupta", "email": "filmclub@example.com", "password": "secure123", "club": "Film Club" },
+    { "id": 5, "name": "Dr. Garima Dalal", "email": "literaryclub@example.com", "password": "secure123", "club": "Literary Club" },
+    { "id": 6, "name": "Dr. Poonam Agarwal", "email": "natureclub@example.com", "password": "secure123", "club": "Nature & Wildlife Club" },
+    { "id": 7, "name": "Dr. Ravi Kumar Umrao", "email": "environmentclub@example.com", "password": "secure123", "club": "Environment Club" }
+  ]
+  
