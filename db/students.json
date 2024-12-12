@@ -1,34 +1,62 @@
 [
   {
+    "email": "student1@example.com",
+    "password": "hashed_password",
     "name": "John Doe",
-    "email": "john@student.com",
-    "password": "123456",
-    "registrationNo": "1234",
     "clubs": [
-      "Dance Club",
+      "Science Club",
       "Music Club"
     ]
   },
   {
-    "id": 2,
-    "name": "anshi",
-    "regNo": "sss",
-    "program": "sss",
-    "school": "sss",
-    "contact": "sss",
-    "email": "ss@em.com",
-    "password": "sss",
-    "clubs": []
+    "email": "F",
+    "password": "F",
+    "name": "F",
+    "clubs": [
+      "Science Club",
+      "Sports Club"
+    ]
   },
   {
-    "id": 3,
-    "name": "",
-    "regNo": "",
-    "program": "",
-    "school": "",
-    "contact": "",
-    "email": "",
-    "password": "",
-    "clubs": []
+    "email": "FH",
+    "password": "F",
+    "name": "F",
+    "clubs": [
+      "Science Club",
+      "Sports Club"
+    ]
+  },
+  {
+    "email": "L",
+    "password": "L",
+    "name": "L",
+    "clubs": [
+      "Sports Club",
+      "Drama Club"
+    ]
+  },
+  {
+    "email": "LK",
+    "password": "L",
+    "name": "L",
+    "clubs": [
+      "Sports Club",
+      "Drama Club"
+    ]
+  },
+  {
+    "email": "a@email.com",
+    "password": "a",
+    "name": "a",
+    "regNo": "a",
+    "progOfStudy": "a",
+    "school": "a",
+    "center": "a",
+    "mobNo": "a",
+    "date": "2024-12-12",
+    "clubs": [
+      "Science Club",
+      "Sports Club"
+    ]
   }
 ]

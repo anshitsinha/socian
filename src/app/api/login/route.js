@@ -1,25 +1,53 @@
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
+import jwt from "jsonwebtoken";
 
-export async function POST(request) {
-  const { email, password } = await request.json();
+const secretKey = process.env.JWT_SECRET;
 
-  // Load students and teachers
-  const studentsPath = path.join(process.cwd(), 'db', 'students.json');
-  const teachersPath = path.join(process.cwd(), 'db', 'teachers.json');
+export async function POST(req) {
+  const { email, password } = await req.json();
 
-  const students = JSON.parse(fs.readFileSync(studentsPath, 'utf8'));
-  const teachers = JSON.parse(fs.readFileSync(teachersPath, 'utf8'));
+  try {
+    const teacherFilePath = path.join(
+      process.cwd(),
+      
+      "db",
+      "teachers.json"
+    );
+    const teachers = JSON.parse(fs.readFileSync(teacherFilePath, "utf-8"));
 
-  // Find user in students or teachers
-  const student = students.find(s => s.email === email && s.password === password);
-  const teacher = teachers.find(t => t.email === email && t.password === password);
+    const studentFilePath = path.join(
+      process.cwd(),
+      
+      "db",
+      "students.json"
+    );
+    const students = JSON.parse(fs.readFileSync(studentFilePath, "utf-8"));
 
-  if (student) {
-    return new Response(JSON.stringify({ role: 'student', user: student }), { status: 200 });
-  } else if (teacher) {
-    return new Response(JSON.stringify({ role: 'teacher', user: teacher }), { status: 200 });
-  } else {
-    return new Response(JSON.stringify({ message: 'Invalid credentials' }), { status: 401 });
+    // Check if user is a teacher
+    const teacher = teachers.find(
+      (t) => t.email === email && t.password === password
+    );
+    if (teacher) {
+      const token = jwt.sign({ type: "teacher", user: teacher }, secretKey);
+      return new Response(JSON.stringify({ token }), { status: 200 });
+    }
+
+    // Check if user is a student
+    const student = students.find(
+      (s) => s.email === email && s.password === password
+    );
+    if (student) {
+      const token = jwt.sign({ type: "student", user: student }, secretKey);
+      return new Response(JSON.stringify({ token }), { status: 200 });
+    }
+
+    return new Response(JSON.stringify({ message: "Invalid credentials" }), {
+      status: 400,
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({message: "Server error", error: error.message }), {
+      status: 500,
+    });
   }
 }
