@@ -21,6 +21,7 @@ const Dashboard = () => {
     try {
       const decoded = jwt.decode(token);
       if (decoded) {
+        console.log(decoded);
         setUser(decoded);
         if (decoded.type === "teacher") {
           fetchStudents(decoded.user.club); // Use decoded.club for teacher's club
@@ -38,7 +39,7 @@ const Dashboard = () => {
       const data = await res.json();
       if (res.ok) {
         setStudents(data);
-        console.log(data)
+        console.log(data);
       } else {
         setError("Failed to fetch students");
       }
@@ -58,14 +59,13 @@ const Dashboard = () => {
       ...student,
       clubs: student.clubs ? student.clubs.join(", ") : "", // Convert array to comma-separated string
     }));
-  
+
     const ws = XLSX.utils.json_to_sheet(studentsWithFormattedClubs); // Create worksheet
     const wb = XLSX.utils.book_new(); // Create new workbook
     XLSX.utils.book_append_sheet(wb, ws, "Students"); // Append worksheet to workbook
-  
+
     XLSX.writeFile(wb, "students_details.xlsx"); // Save file
   };
-  
 
   if (error) {
     return <div className="text-red-600">{error}</div>;
@@ -75,7 +75,6 @@ const Dashboard = () => {
     return <div>Loading...</div>;
   }
 
- 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
       <h1 className="text-2xl font-semibold mb-4">Dashboard</h1>
@@ -83,35 +82,35 @@ const Dashboard = () => {
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <p className="font-medium">Name:</p>
-          <p>{user?.user?.name}</p>
+          <p>{user?.name}</p>
         </div>
         <div className="flex justify-between items-center">
           <p className="font-medium">Email:</p>
-          <p>{user?.user?.email}</p>
+          <p>{user?.email}</p>
         </div>
         <div className="flex justify-between items-center">
           <p className="font-medium">Registration No:</p>
-          <p>{user?.user?.regNo}</p>
+          <p>{user?.regNo}</p>
         </div>
         <div className="flex justify-between items-center">
           <p className="font-medium">Program of Study:</p>
-          <p>{user?.user?.progOfStudy}</p>
+          <p>{user?.progOfStudy}</p>
         </div>
         <div className="flex justify-between items-center">
           <p className="font-medium">School:</p>
-          <p>{user?.user?.school}</p>
+          <p>{user?.school}</p>
         </div>
         <div className="flex justify-between items-center">
           <p className="font-medium">Center:</p>
-          <p>{user?.user?.center}</p>
+          <p>{user?.center}</p>
         </div>
         <div className="flex justify-between items-center">
           <p className="font-medium">Mobile No:</p>
-          <p>{user?.user?.mobNo}</p>
+          <p>{user?.mobNo}</p>
         </div>
         <div className="flex justify-between items-center">
           <p className="font-medium">Date:</p>
-          <p>{user?.user?.date}</p>
+          <p>{user?.date}</p>
         </div>
 
         {user?.type === "teacher" ? (
@@ -143,7 +142,7 @@ const Dashboard = () => {
         ) : (
           <div className="mt-6">
             <h2 className="text-xl font-semibold mb-4">
-              Clubs: {user?.user?.clubs?.join(", ")}
+              Clubs: {user?.clubs?.join(", ")}
             </h2>
           </div>
         )}

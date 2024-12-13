@@ -1,32 +1,9 @@
-import fs from 'fs';
-import path from 'path';
+import { connectToDB } from '@/db';
 import jwt from 'jsonwebtoken';
-
-const studentsFilePath = path.join(process.cwd(), 'db', 'students.json');
-
-// Ensure studentsData is correctly loaded
-let studentsData = [];
-
-// Initialize studentsData from the file if it exists
-if (fs.existsSync(studentsFilePath)) {
-  try {
-    studentsData = JSON.parse(fs.readFileSync(studentsFilePath, 'utf-8'));
-  } catch (err) {
-    console.error('Error reading students data:', err);
-  }
-}
+import bcrypt from 'bcryptjs';  // Import bcrypt
 
 export async function POST(req) {
-  const { email, password, name, regNo, progOfStudy, school, center, mobNo, date, clubs } = await req.json(); // Get clubs and other data from the request
-
-  // Check if the email already exists
-  const existingStudent = studentsData.find((s) => s.email === email);
-  if (existingStudent) {
-    return new Response(JSON.stringify({ message: 'Email already exists' }), { status: 400 });
-  }
-
-  // Add the new student to the data
-  const newStudent = {
+  const {
     email,
     password,
     name,
@@ -36,15 +13,39 @@ export async function POST(req) {
     center,
     mobNo,
     date,
+    clubs,
+  } = await req.json();
+
+  const db = await connectToDB();
+  const studentsCollection = db.collection('students');
+
+  // Check if the email already exists
+  const existingStudent = await studentsCollection.findOne({ email });
+  if (existingStudent) {
+    return new Response(JSON.stringify({ message: 'Email already exists' }), { status: 400 });
+  }
+
+  // Hash the password before storing
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // Add the new student to the database with hashed password
+  const newStudent = {
+    email,
+    password: hashedPassword,  // Store hashed password
+    name,
+    regNo,
+    progOfStudy,
+    school,
+    center,
+    mobNo,
+    date,
     clubs: clubs || [],
   };
-  studentsData.push(newStudent);
 
-  // Write the updated data back to the file
   try {
-    fs.writeFileSync(studentsFilePath, JSON.stringify(studentsData, null, 2));
+    await studentsCollection.insertOne(newStudent);
   } catch (err) {
-    console.error('Error writing to students file:', err);
+    console.error('Error adding student to database:', err);
     return new Response(JSON.stringify({ message: 'Failed to register' }), { status: 500 });
   }
 

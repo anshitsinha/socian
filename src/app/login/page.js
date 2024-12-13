@@ -11,7 +11,7 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
+  
     const res = await fetch('/api/login', {
       method: 'POST',
       headers: {
@@ -19,20 +19,22 @@ const Login = () => {
       },
       body: JSON.stringify({ email, password }),
     });
-
+  
     const data = await res.json();
-
+  
+    console.log('Login response:', data);  // Log the response from the server
+  
     if (res.ok) {
       // Store the token in localStorage
       localStorage.setItem('token', data.token);
-
+  
       // Redirect to the dashboard
       router.push('/dashboard');
     } else {
       setError(data.message || 'Login failed');
     }
   };
-
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
