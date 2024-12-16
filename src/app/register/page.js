@@ -1,23 +1,50 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const Register = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [regNo, setRegNo] = useState('');
-  const [progOfStudy, setProgOfStudy] = useState('');
-  const [school, setSchool] = useState('');
-  const [center, setCenter] = useState('');
-  const [mobNo, setMobNo] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]); // Default date to current date
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [regNo, setRegNo] = useState("");
+  const [progOfStudy, setProgOfStudy] = useState("");
+  const [school, setSchool] = useState("");
+  const [center, setCenter] = useState("");
+  const [mobNo, setMobNo] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // Default date to current date
   const [selectedClubs, setSelectedClubs] = useState([]);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const router = useRouter();
 
-  const clubs = ['Science Club', 'Sports Club', 'Drama Club', 'Music Club']; // Example clubs
+  const clubs = [
+    {
+      name: "Dance Club",
+      coordinator: "Dr. Anupama Namburu, School of Engineering",
+    },
+    { name: "Debating Club", coordinator: "Dr. Umesh Kumar Khute, CHS/SSS" },
+    { name: "Drama Club", coordinator: "Dr. Vijender Singh, SSIS" },
+    { name: "Film Club", coordinator: "Dr. Vinay Kumar Gupta, CFFS/SLL&CS" },
+    { name: "Fine Arts Club", coordinator: "" },
+    {
+      name: "Literary Club",
+      coordinator: "Dr. Garima Dalal, Linguistic Empowerment Cell",
+    },
+    { name: "Music Club", coordinator: "" },
+    {
+      name: "Nature & Wildlife Club",
+      coordinator:
+        "Dr. Poonam Agarwal, SC&SS, Dr. Sachin Balkrushna Jadhav, SC&SS",
+    },
+    { name: "Photography Club", coordinator: "Dr. Suraj Mal, CSRD/SSS" },
+    {
+      name: "UNESCO Club",
+      coordinator:
+        "Dr. Sandeep Kumar Pandey, CRS/SLL&CS, Dr. Archana Kumari, CMS/SSS",
+    },
+    { name: "Wellness Club", coordinator: "Dr. Suman Beniwal, CRS/SLL&CS" },
+    { name: "Environment Club", coordinator: "Dr. Ravi Kumar Umrao, SES" },
+  ];
 
   const handleCheckboxChange = (club) => {
     setSelectedClubs((prevSelectedClubs) => {
@@ -31,10 +58,10 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    const res = await fetch('/api/register', {
-      method: 'POST',
+    const res = await fetch("/api/register", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         email,
@@ -54,12 +81,12 @@ const Register = () => {
 
     if (res.ok) {
       // Store the JWT token in localStorage
-      localStorage.setItem('token', data.token);
+      localStorage.setItem("token", data.token);
 
       // Redirect to the dashboard
-      router.push('/dashboard');
+      router.push("/dashboard");
     } else {
-      setError(data.message || 'Something went wrong');
+      setError(data.message || "Something went wrong");
     }
   };
 
@@ -68,7 +95,9 @@ const Register = () => {
       <h1 className="text-3xl font-bold text-center mb-6">Register</h1>
       <form onSubmit={handleRegister} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Name</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Name
+          </label>
           <input
             type="text"
             placeholder="Enter your full name"
@@ -80,7 +109,9 @@ const Register = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Registration No.</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Registration No.
+          </label>
           <input
             type="text"
             placeholder="Enter your registration number"
@@ -92,7 +123,9 @@ const Register = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Program of Study</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Program of Study
+          </label>
           <input
             type="text"
             placeholder="Enter your program of study"
@@ -104,7 +137,9 @@ const Register = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">School</label>
+          <label className="block text-sm font-medium text-gray-700">
+            School
+          </label>
           <input
             type="text"
             placeholder="Enter your school"
@@ -116,7 +151,9 @@ const Register = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Center</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Center
+          </label>
           <input
             type="text"
             placeholder="Enter your center"
@@ -128,7 +165,9 @@ const Register = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Mobile Number</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Mobile Number
+          </label>
           <input
             type="text"
             placeholder="Enter your mobile number"
@@ -140,7 +179,9 @@ const Register = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Email</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Email
+          </label>
           <input
             type="email"
             placeholder="Enter your email"
@@ -152,7 +193,9 @@ const Register = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Password</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Password
+          </label>
           <input
             type="password"
             placeholder="Enter your password"
@@ -164,7 +207,9 @@ const Register = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Date</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Date
+          </label>
           <input
             type="date"
             value={date}
@@ -175,20 +220,28 @@ const Register = () => {
         </div>
 
         <div>
-          <h3 className="text-lg font-medium text-gray-700 mb-2">Select Clubs</h3>
+          <h3 className="text-lg font-medium text-gray-700 mb-2">
+            Select Clubs
+          </h3>
           {clubs.map((club) => (
-            <label key={club} className="inline-flex items-center space-x-2 mb-2">
-              <input
-                type="checkbox"
-                checked={selectedClubs.includes(club)}
-                onChange={() => handleCheckboxChange(club)}
-                className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
-              />
-              <span className="text-sm text-gray-700">{club}</span>
-            </label>
+            <div key={club.name} className="mb-4">
+              <label className="inline-flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={selectedClubs.includes(club.name)}
+                  onChange={() => handleCheckboxChange(club.name)}
+                  className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                />
+                <span className="text-sm text-gray-700">{club.name}</span>
+              </label>
+              {club.coordinator && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Coordinator: {club.coordinator}
+                </p>
+              )}
+            </div>
           ))}
         </div>
-
 
         <button
           type="submit"
