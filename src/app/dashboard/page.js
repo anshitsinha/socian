@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import * as XLSX from 'xlsx'; // For Excel export
 
 const Dashboard = () => {
@@ -9,11 +10,24 @@ const Dashboard = () => {
   const [selectAll, setSelectAll] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
+    // Check if the adminToken exists in localStorage
+    const adminToken = localStorage.getItem('adminToken');
+    if (!adminToken) {
+      // Redirect to login if no token exists
+      router.push('/login');
+      return;
+    }
+
     const fetchStudents = async () => {
       try {
-        const res = await fetch('/api/admin/students');
+        const res = await fetch('/api/admin/students', {
+          headers: {
+            'Authorization': `Bearer ${adminToken}`,
+          },
+        });
         if (!res.ok) {
           throw new Error('Failed to fetch student data');
         }
@@ -27,7 +41,7 @@ const Dashboard = () => {
     };
 
     fetchStudents();
-  }, []);
+  }, [router]);
 
   const handleSelectAll = () => {
     setSelectAll(!selectAll);
@@ -59,7 +73,16 @@ const Dashboard = () => {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Students');
     XLSX.writeFile(workbook, 'students.xlsx');
   };
-  
+
+  // Handle logout functionality
+  const handleLogout = () => {
+    // Remove the admin token from localStorage
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('students');
+    
+    // Redirect to the login page
+    router.push('/login');
+  };
 
   if (loading) {
     return <div className="text-center mt-8">Loading...</div>;
@@ -72,6 +95,17 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen p-6 bg-gray-100">
       <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+
+      {/* Logout Button */}
+      <div className="text-right mb-4">
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600"
+        >
+          Logout
+        </button>
+      </div>
+
       <div className="mb-4 flex justify-between items-center">
         <button
           onClick={exportToExcel}

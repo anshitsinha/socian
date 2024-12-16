@@ -7,7 +7,7 @@ const HomePage = () => {
   return (
     <div>
       {/* Navbar */}
-      <Navbar/>
+      
 
       {/* Hero Section */}
       <header className="bg-indigo-600 text-white h-screen flex flex-col justify-center items-center text-center">

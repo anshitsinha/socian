@@ -1,9 +1,9 @@
 import { connectToDB } from '@/db';
 import jwt from 'jsonwebtoken';
 
-const secretKey = process.env.JWT_SECRET; // Replace with a secure key
-const adminEmail = 'admin@example.com'; // Hardcoded admin email
-const adminPassword = 'admin123'; // Hardcoded admin password
+const secretKey = process.env.JWT_SECRET; // Use a secure key
+const adminEmail = 'admin@example.com'; // Admin email for validation
+const adminPassword = 'admin123'; // Admin password for validation
 
 export async function POST(req) {
   const { email, password } = await req.json();
@@ -11,7 +11,7 @@ export async function POST(req) {
   try {
     // Check if the credentials match the admin
     if (email === adminEmail && password === adminPassword) {
-      // Generate a JWT token for the admin
+      // Generate JWT token for the admin
       const token = jwt.sign({ email, role: 'admin' }, secretKey, { expiresIn: '1h' });
 
       // Fetch all student data
