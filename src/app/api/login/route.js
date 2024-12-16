@@ -2,7 +2,7 @@ import { connectToDB } from '@/db';
 import jwt from 'jsonwebtoken';
 
 const secretKey = process.env.JWT_SECRET; // Use a secure key
-const adminEmail = 'admin@example.com'; // Admin email for validation
+const adminEmail = 'admin@email.com'; // Admin email for validation
 const adminPassword = 'admin123'; // Admin password for validation
 
 export async function POST(req) {
