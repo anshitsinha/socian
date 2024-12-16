@@ -1,159 +1,138 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import jwt from "jsonwebtoken";
-import * as XLSX from "xlsx"; // Import the xlsx library
+import { useEffect, useState } from 'react';
+import * as XLSX from 'xlsx'; // For Excel export
 
 const Dashboard = () => {
-  const [user, setUser] = useState(null);
-  const [error, setError] = useState("");
   const [students, setStudents] = useState([]);
-  const router = useRouter();
+  const [selectedStudents, setSelectedStudents] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/login");
-      return;
-    }
-
-    try {
-      const decoded = jwt.decode(token);
-      if (decoded) {
-        console.log(decoded);
-        setUser(decoded);
-        if (decoded.type === "teacher") {
-          fetchStudents(decoded.user.club); // Use decoded.club for teacher's club
+    const fetchStudents = async () => {
+      try {
+        const res = await fetch('/api/admin/students');
+        if (!res.ok) {
+          throw new Error('Failed to fetch student data');
         }
-      }
-    } catch (err) {
-      setError("Invalid token");
-      router.push("/login");
-    }
-  }, [router]);
-
-  const fetchStudents = async (club) => {
-    try {
-      const res = await fetch(`/api/students?club=${club}`);
-      const data = await res.json();
-      if (res.ok) {
+        const data = await res.json();
         setStudents(data);
-        console.log(data);
-      } else {
-        setError("Failed to fetch students");
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError("Error fetching students");
+    };
+
+    fetchStudents();
+  }, []);
+
+  const handleSelectAll = () => {
+    setSelectAll(!selectAll);
+    if (!selectAll) {
+      setSelectedStudents(students.map((student) => student.email));
+    } else {
+      setSelectedStudents([]);
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    router.push("/login");
+  const handleCheckboxChange = (email) => {
+    if (selectedStudents.includes(email)) {
+      setSelectedStudents(selectedStudents.filter((id) => id !== email));
+    } else {
+      setSelectedStudents([...selectedStudents, email]);
+    }
   };
 
   const exportToExcel = () => {
-    // Include the 'clubs' field, converting it to a comma-separated string
-    const studentsWithFormattedClubs = students.map((student) => ({
-      ...student,
-      clubs: student.clubs ? student.clubs.join(", ") : "", // Convert array to comma-separated string
-    }));
-
-    const ws = XLSX.utils.json_to_sheet(studentsWithFormattedClubs); // Create worksheet
-    const wb = XLSX.utils.book_new(); // Create new workbook
-    XLSX.utils.book_append_sheet(wb, ws, "Students"); // Append worksheet to workbook
-
-    XLSX.writeFile(wb, "students_details.xlsx"); // Save file
+    const selectedData = students
+      .filter((student) => selectedStudents.includes(student.email))
+      .map((student) => ({
+        ...student,
+        clubs: student.clubs?.join(', ') || 'N/A', // Join the clubs array into a string
+      }));
+  
+    const worksheet = XLSX.utils.json_to_sheet(selectedData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Students');
+    XLSX.writeFile(workbook, 'students.xlsx');
   };
+  
 
-  if (error) {
-    return <div className="text-red-600">{error}</div>;
+  if (loading) {
+    return <div className="text-center mt-8">Loading...</div>;
   }
 
-  if (!user) {
-    return <div>Loading...</div>;
+  if (error) {
+    return <div className="text-center mt-8 text-red-600">Error: {error}</div>;
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
-      <h1 className="text-2xl font-semibold mb-4">Dashboard</h1>
-
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <p className="font-medium">Name:</p>
-          <p>{user?.name}</p>
-        </div>
-        <div className="flex justify-between items-center">
-          <p className="font-medium">Email:</p>
-          <p>{user?.email}</p>
-        </div>
-        <div className="flex justify-between items-center">
-          <p className="font-medium">Registration No:</p>
-          <p>{user?.regNo}</p>
-        </div>
-        <div className="flex justify-between items-center">
-          <p className="font-medium">Program of Study:</p>
-          <p>{user?.progOfStudy}</p>
-        </div>
-        <div className="flex justify-between items-center">
-          <p className="font-medium">School:</p>
-          <p>{user?.school}</p>
-        </div>
-        <div className="flex justify-between items-center">
-          <p className="font-medium">Center:</p>
-          <p>{user?.center}</p>
-        </div>
-        <div className="flex justify-between items-center">
-          <p className="font-medium">Mobile No:</p>
-          <p>{user?.mobNo}</p>
-        </div>
-        <div className="flex justify-between items-center">
-          <p className="font-medium">Date:</p>
-          <p>{user?.date}</p>
-        </div>
-
-        {user?.type === "teacher" ? (
-          <div className="mt-6">
-            <h2 className="text-xl font-semibold mb-4">
-              Assigned Club: {user?.user?.club}
-            </h2>
-            <h3 className="text-lg font-medium">Students in your club:</h3>
-            {students.length > 0 ? (
-              <div className="space-y-2">
-                <ul className="list-disc pl-5">
-                  {students.map((student) => (
-                    <li key={student.email} className="text-gray-700">
-                      {student.name}
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  className="mt-4 py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                  onClick={exportToExcel}
-                >
-                  Export to Excel
-                </button>
-              </div>
-            ) : (
-              <p>No students in this club.</p>
-            )}
-          </div>
-        ) : (
-          <div className="mt-6">
-            <h2 className="text-xl font-semibold mb-4">
-              Clubs: {user?.clubs?.join(", ")}
-            </h2>
-          </div>
-        )}
+    <div className="min-h-screen p-6 bg-gray-100">
+      <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+      <div className="mb-4 flex justify-between items-center">
+        <button
+          onClick={exportToExcel}
+          className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
+          disabled={selectedStudents.length === 0}
+        >
+          Export Selected to Excel
+        </button>
+        <label className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={selectAll}
+            onChange={handleSelectAll}
+          />
+          <span>Select All</span>
+        </label>
       </div>
-
-      <button
-        className="mt-6 py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700"
-        onClick={handleLogout}
-      >
-        Logout
-      </button>
+      <table className="w-full border-collapse bg-white shadow-md rounded-lg">
+        <thead>
+          <tr className="bg-gray-200 text-left">
+            <th className="p-4 border-b">
+              <input
+                type="checkbox"
+                checked={selectAll}
+                onChange={handleSelectAll}
+              />
+            </th>
+            <th className="p-4 border-b">Name</th>
+            <th className="p-4 border-b">Email</th>
+            <th className="p-4 border-b">Registration Number</th>
+            <th className="p-4 border-b">Program of Study</th>
+            <th className="p-4 border-b">School</th>
+            <th className="p-4 border-b">Center</th>
+            <th className="p-4 border-b">Mobile Number</th>
+            <th className="p-4 border-b">Date</th>
+            <th className="p-4 border-b">Clubs</th>
+          </tr>
+        </thead>
+        <tbody>
+          {students.map((student) => (
+            <tr key={student.email} className="hover:bg-gray-100">
+              <td className="p-4 border-b">
+                <input
+                  type="checkbox"
+                  checked={selectedStudents.includes(student.email)}
+                  onChange={() => handleCheckboxChange(student.email)}
+                />
+              </td>
+              <td className="p-4 border-b">{student.name}</td>
+              <td className="p-4 border-b">{student.email}</td>
+              <td className="p-4 border-b">{student.regNo}</td>
+              <td className="p-4 border-b">{student.progOfStudy}</td>
+              <td className="p-4 border-b">{student.school}</td>
+              <td className="p-4 border-b">{student.center}</td>
+              <td className="p-4 border-b">{student.mobNo}</td>
+              <td className="p-4 border-b">{student.date}</td>
+              <td className="p-4 border-b">{student.clubs?.join(', ') || 'N/A'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
