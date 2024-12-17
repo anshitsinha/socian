@@ -28,7 +28,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-gray-900 p-4 shadow-lg fixed w-full top-0 z-50">
+    <nav className=" bg-gray-900 sticky p-4 shadow-lg  w-full top-0 z-50">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <Link href="/" className="text-2xl font-bold text-white">
           Socian

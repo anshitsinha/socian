@@ -25,7 +25,7 @@ const Dashboard = () => {
       try {
         const res = await fetch('/api/admin/students', {
           headers: {
-            'Authorization': `Bearer ${adminToken}`,
+            Authorization: `Bearer ${adminToken}`,
           },
         });
         if (!res.ok) {
@@ -67,20 +67,61 @@ const Dashboard = () => {
         ...student,
         clubs: student.clubs?.join(', ') || 'N/A', // Join the clubs array into a string
       }));
-  
+
     const worksheet = XLSX.utils.json_to_sheet(selectedData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Students');
     XLSX.writeFile(workbook, 'students.xlsx');
   };
 
+  const handleDeleteStudents = async () => {
+    if (selectedStudents.length === 0) {
+      alert('No students selected for deletion.');
+      return;
+    }
+
+    const confirmDeletion = window.confirm(
+      `Are you sure you want to delete ${selectedStudents.length} student(s)?`
+    );
+    if (!confirmDeletion) return;
+
+    const adminToken = localStorage.getItem('adminToken');
+
+    try {
+      const res = await fetch('/api/admin/students', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify({ emails: selectedStudents }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to delete students');
+      }
+
+      const result = await res.json();
+      alert(result.message);
+
+      // Remove deleted students from the state
+      setStudents((prevStudents) =>
+        prevStudents.filter(
+          (student) => !selectedStudents.includes(student.email)
+        )
+      );
+      setSelectedStudents([]);
+      setSelectAll(false);
+    } catch (error) {
+      console.error('Error:', error.message);
+      alert(`Error deleting students: ${error.message}`);
+    }
+  };
+
   // Handle logout functionality
   const handleLogout = () => {
-    // Remove the admin token from localStorage
     localStorage.removeItem('adminToken');
-    localStorage.removeItem('students');
-    
-    // Redirect to the login page
     router.push('/login');
   };
 
@@ -113,6 +154,13 @@ const Dashboard = () => {
           disabled={selectedStudents.length === 0}
         >
           Export Selected to Excel
+        </button>
+        <button
+          onClick={handleDeleteStudents}
+          className="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600"
+          disabled={selectedStudents.length === 0}
+        >
+          Delete Selected
         </button>
         <label className="flex items-center space-x-2">
           <input

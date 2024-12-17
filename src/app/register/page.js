@@ -5,16 +5,16 @@ import { useRouter } from "next/navigation";
 
 const Register = () => {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [regNo, setRegNo] = useState("");
   const [progOfStudy, setProgOfStudy] = useState("");
   const [school, setSchool] = useState("");
   const [center, setCenter] = useState("");
   const [mobNo, setMobNo] = useState("");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // Default date to current date
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [selectedClubs, setSelectedClubs] = useState([]);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
   const router = useRouter();
 
   const clubs = [
@@ -25,12 +25,12 @@ const Register = () => {
     { name: "Debating Club", coordinator: "Dr. Umesh Kumar Khute, CHS/SSS" },
     { name: "Drama Club", coordinator: "Dr. Vijender Singh, SSIS" },
     { name: "Film Club", coordinator: "Dr. Vinay Kumar Gupta, CFFS/SLL&CS" },
-    { name: "Fine Arts Club", coordinator: "" },
+    { name: "Fine Arts Club", coordinator: "Dr. Poonam Agarwal, SC&SS" },
     {
       name: "Literary Club",
       coordinator: "Dr. Garima Dalal, Linguistic Empowerment Cell",
     },
-    { name: "Music Club", coordinator: "" },
+    { name: "Music Club", coordinator: "Dr. Archana Kumari, CMS/SSS" },
     {
       name: "Nature & Wildlife Club",
       coordinator:
@@ -65,7 +65,6 @@ const Register = () => {
       },
       body: JSON.stringify({
         email,
-        password,
         name,
         regNo,
         progOfStudy,
@@ -80,11 +79,9 @@ const Register = () => {
     const data = await res.json();
 
     if (res.ok) {
-      // Store the JWT token in localStorage
-      localStorage.setItem("token", data.token);
-
-      // Redirect to the dashboard
-      router.push("/dashboard");
+      setSuccess(true);
+      // Optionally redirect to a login or success page after a delay
+      setTimeout(() => router.push("/login"), 2000);
     } else {
       setError(data.message || "Something went wrong");
     }
@@ -187,20 +184,6 @@ const Register = () => {
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Password
-          </label>
-          <input
-            type="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
             required
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
           />
