@@ -23,6 +23,22 @@ const Dashboard = () => {
       return;
     }
 
+    // Decode the token to check the expiration
+    try {
+      const decodedToken = jwt_decode(adminToken);
+      const currentTime = Date.now() / 1000; // Get current time in seconds
+      if (decodedToken.exp < currentTime) {
+        localStorage.removeItem("adminToken"); // Remove the expired token
+        router.push("/login"); // Redirect to login page
+        return;
+      }
+    } catch (error) {
+      // Handle invalid or corrupted token
+      localStorage.removeItem("adminToken");
+      router.push("/login");
+      return;
+    }
+
     const fetchStudents = async () => {
       try {
         const res = await fetch("/api/admin/students", {
