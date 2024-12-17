@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
@@ -31,7 +31,7 @@ const Navbar = () => {
     <nav className=" bg-gray-900 sticky p-4 shadow-lg  w-full top-0 z-50">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <Link href="/" className="text-2xl font-bold text-white">
-          Socian
+          Office of Dean of Students
         </Link>
 
         {/* Desktop Menu */}
@@ -70,7 +70,9 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden ${isMenuOpen ? "block" : "hidden"} bg-gray-900 text-white`}
+        className={`md:hidden ${
+          isMenuOpen ? "block" : "hidden"
+        } bg-gray-900 text-white`}
       >
         <div className="flex flex-col items-center py-4 space-y-4">
           <Link href="/" className="hover:text-indigo-400">

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -15,7 +14,9 @@ const Register = () => {
   const [selectedClubs, setSelectedClubs] = useState([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false); // Loading state for the button
+  const [modalMessage, setModalMessage] = useState(""); // Modal message
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility
 
   const clubs = [
     {
@@ -57,6 +58,7 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setIsLoading(true); // Start loading state
 
     const res = await fetch("/api/register", {
       method: "POST",
@@ -77,14 +79,36 @@ const Register = () => {
     });
 
     const data = await res.json();
+    setIsLoading(false); // Stop loading state
 
     if (res.ok) {
       setSuccess(true);
-      // Optionally redirect to a login or success page after a delay
-      setTimeout(() => router.push("/login"), 2000);
+      setModalMessage("Please contact deans office to make the payment.");
+      setTimeout(() => {
+        setIsModalOpen(true); // Open the modal
+        clearForm();
+      }, 500); // Delay to show modal after form clears
     } else {
-      setError(data.message || "Something went wrong");
+      setError(true);
+      setModalMessage(data.message || "Something went wrong.");
+      setIsModalOpen(true); // Open modal on error
     }
+  };
+
+  const clearForm = () => {
+    setName("");
+    setRegNo("");
+    setProgOfStudy("");
+    setSchool("");
+    setCenter("");
+    setMobNo("");
+    setEmail("");
+    setDate(new Date().toISOString().split("T")[0]);
+    setSelectedClubs([]);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -228,11 +252,36 @@ const Register = () => {
 
         <button
           type="submit"
-          className="w-full py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className={`w-full py-2 text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+            isLoading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-indigo-600 hover:bg-indigo-700"
+          }`}
+          disabled={isLoading} // Disable button when loading
         >
-          Register
+          {isLoading ? "Loading..." : "Register"}
         </button>
       </form>
+
+      {/* Modal Popup */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-md w-1/3">
+            <h2 className="text-2xl font-semibold text-center mb-4">
+              {success ? "Successfully registered!" : "Error!"}
+            </h2>
+            <p className="text-center text-gray-700 mb-4">{modalMessage}</p>
+            <div className="text-center">
+              <button
+                onClick={closeModal}
+                className="py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {error && <p className="mt-4 text-center text-red-600">{error}</p>}
     </div>
